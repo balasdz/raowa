@@ -1,6 +1,6 @@
 from time import sleep
 import sys
-sys.path.append("/app")
+sys.path.append("/app/site-packages")
 from init import *
 
 class YouLikeHits:
