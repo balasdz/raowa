@@ -12,7 +12,8 @@ WORKDIR /app
 COPY requirements.txt .
 
 # Install any needed packages specified in requirements.txt
-RUN /app/site-packages pip install -r requirements.txt
+RUN pip install --no-cache-dir seleniumbase==4.24.5
+
 
 # Copy the rest of your application's code to the working directory in the container
 COPY . .
