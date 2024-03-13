@@ -1,4 +1,4 @@
-selenium==4.8.0
+selenium
 webdriver_manager
 Flask
 gunicorn
