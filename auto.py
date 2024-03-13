@@ -1,8 +1,10 @@
-import os
+from flask import Flask
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+
+app = Flask(__name__)
 
 class YouLikeHits:
     def __init__(self):
@@ -46,6 +48,11 @@ class YouLikeHits:
                     self.browser.close()
                     self.browser.switch_to.window(self.browser.window_handles[0])
 
-if __name__ == "__main__":
+@app.route('/')
+def home():
     ylh = YouLikeHits()
     ylh.get_point()
+    return 'Process complete. Check the console for details.'
+
+if __name__ == "__main__":
+    app.run()
