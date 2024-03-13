@@ -1,22 +1,16 @@
-# Use the official Python image as base
-FROM python:3.9-slim
+ARG PORT=443
+FROM cypress/browsers:latest
 
-# Set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+RUN apt-get install python3 -y
 
-# Set the working directory in the container
-WORKDIR /app
+RUN echo $(python3 -m site --user-base)
 
-# Copy the dependencies file to the working directory
 COPY requirements.txt .
 
-# Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir seleniumbase==4.24.5
+ENV PATH /host/root/.local/bin:${PATH}
 
+RUN apt-get update && apt-get install -y python3-pip && pip install -r requirements.txt
 
-# Copy the rest of your application's code to the working directory in the container
 COPY . .
 
-# Command to run your application
-CMD ["python", "auto.py"]
+CMD uvicorn main:app --host 0.0.0.0 --port $PORT
