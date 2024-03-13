@@ -3,7 +3,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium import webdriver
-from selenium.webdriver.common.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 import os
 
@@ -18,7 +17,7 @@ class YouLikeHits:
         chrome_options.add_argument("--headless")
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
-        self.browser = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+        self.browser = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
 
     def login(self):
         self.browser.get('https://www.youlikehits.com/login.php')
