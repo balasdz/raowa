@@ -1,35 +1,22 @@
-import os
-from flask import Flask
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
+from flask import Flask, request
+from selenium.webdriver.common.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
+from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import os
 
 app = Flask(__name__)
-
-class Setup:
-    def __init__(self):
-        self.chromedriver_path = "/workspace/.chromedriver/bin/chromedriver"
-
-    def init(self):
-        # تهيئة خيارات المستعرض
-        chrome_options = Options()
-        chrome_options.add_argument("--headless")
-        chrome_options.add_argument("--no-sandbox")
-        chrome_options.add_argument("--disable-dev-shm-usage")
-
-        # إعداد خدمة المستعرض
-        service = Service(self.chromedriver_path)
-
-        # تهيئة مستعرض Chrome
-        self.browser = webdriver.Chrome(service=service, options=chrome_options)
-
-    def close_browser(self):
-        self.browser.quit()
 
 class YouLikeHits:
     def __init__(self):
         self.setup = Setup()
+
+    def get_point(self):
+        point = self.setup.browser.find_element(By.ID, 'currentpoints')
+        print('Your point is: ' + point.text)
+        return point
 
     def go_to_website(self):
         # انتقال إلى موقع YouLikeHits
@@ -69,19 +56,25 @@ class YouLikeHits:
     def close_browser(self):
         self.setup.close_browser()
 
-@app.route('/', methods=['GET'])
-def home():
-    ylh = YouLikeHits()
+def integrate_functions():
+    # Call the YouLikeHits function only
+    you_like_hits = YouLikeHits()
     try:
-        ylh.setup.init()
-        ylh.go_to_website()
+        you_like_hits.setup.init()
+        you_like_hits.go_to_website()
     except:
-        ylh.get_point()
+        you_like_hits.get_point()
         print('Content not found to watch or surf. Refreshing webpage...')
     finally:
-        ylh.close_browser()
+        you_like_hits.close_browser()
 
-    return "Process completed."
+@app.route('/', methods=['GET', 'POST'])
+def home():
+    if request.method == 'GET':
+        integrate_functions()
+        return "Process Completed"
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.getenv("PORT", default=5000)))
+    # Use the Railway-provided port
+    port = int(os.getenv("PORT", default=5050))
+    app.run(host='0.0.0.0', port=port)
