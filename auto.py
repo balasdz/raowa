@@ -1,28 +1,26 @@
 import os
+from flask import Flask, request
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
+
+app = Flask(__name__)
 
 class Setup:
     def __init__(self):
-        self.project_directory = os.path.dirname(os.path.abspath(__file__))
-        self.chromedriver_path = os.path.join(self.project_directory, "chromedriver.exe")
+        self.chrome_options = Options()
+        self.chrome_options.add_argument("--headless")
+        self.chrome_options.add_argument("--no-sandbox")
+        self.chrome_options.add_argument("--disable-dev-shm-usage")
+        self.service = Service(ChromeDriverManager().install())
+        self.browser = None
 
-    def init(self):
-        # إعداد خيارات المستعرض
-        chrome_options = Options()
-        chrome_options.add_argument("--headless")
-        chrome_options.add_argument("--no-sandbox")
-        chrome_options.add_argument("--disable-dev-shm-usage")
-
-        # إعداد خدمة المستعرض
-        service = Service(self.chromedriver_path)
-
-        # تهيئة مستعرض Chrome
-        self.browser = webdriver.Chrome(service=service, options=chrome_options)
+    def init_browser(self):
+        self.browser = webdriver.Chrome(service=self.service, options=self.chrome_options)
 
     def close_browser(self):
         self.browser.quit()
@@ -37,11 +35,8 @@ class YouLikeHits:
         return point
 
     def go_to_website(self):
-        # انتقال إلى موقع YouLikeHits
         self.setup.browser.get('https://www.youlikehits.com/login.php')
         WebDriverWait(self.setup.browser, 10).until(EC.presence_of_element_located((By.ID, 'username')))
-
-        # ملء اسم المستخدم وكلمة المرور وتسجيل الدخول
         uid = self.setup.browser.find_element(By.ID, 'username')
         uid.send_keys('am plays')
         pwd = self.setup.browser.find_element(By.ID, 'password')
@@ -74,13 +69,20 @@ class YouLikeHits:
     def close_browser(self):
         self.setup.close_browser()
 
-if __name__ == "__main__":
+@app.route('/', methods=['GET'])
+def home():
     ylh = YouLikeHits()
     try:
-        ylh.setup.init()
+        ylh.setup.init_browser()
         ylh.go_to_website()
-    except:
+    except Exception as e:
+        print(e)
         ylh.get_point()
         print('Content not found to watch or surf. Refreshing webpage...')
     finally:
         ylh.close_browser()
+
+if __name__ == '__main__':
+    # Use the Railway-provided port
+    port = int(os.getenv("PORT", default=5050))
+    app.run(host='0.0.0.0', port=port)
