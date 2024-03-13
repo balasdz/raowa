@@ -4,3 +4,4 @@ Flask
 gunicorn
 packaging
 beautifulsoup4==4.11.1
+undetected_chromedriver==3.1.7
