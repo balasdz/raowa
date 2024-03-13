@@ -1,5 +1,6 @@
-selenium
+selenium==4.8.0
 webdriver_manager
 Flask
 gunicorn
 packaging
+beautifulsoup4==4.11.1
