@@ -10,7 +10,7 @@ RUN apt-get update && \
 RUN curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - && \
     echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list && \
     apt-get -y update && \
-    apt-get -y install google-chrome-stable
+    apt-get -y install google-chrome-stable=94.0.4606.71-1
 
 # تحميل وتثبيت مدير التشغيل
 RUN wget https://chromedriver.storage.googleapis.com/94.0.4606.41/chromedriver_linux64.zip && \
@@ -22,10 +22,10 @@ RUN wget https://chromedriver.storage.googleapis.com/94.0.4606.41/chromedriver_l
 WORKDIR /app
 
 # نسخ ملفات التطبيق إلى دليل العمل في الصورة
-COPY auto.py /app/
+COPY . /app
 
 # تثبيت متطلبات التطبيق
-RUN pip install --no-cache-dir selenium
+RUN pip install --no-cache-dir -r requirements.txt
 
 # تشغيل التطبيق عند بدء تشغيل الصورة
 CMD ["python", "auto.py"]
