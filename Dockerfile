@@ -6,10 +6,12 @@ RUN apt-get update && \
     apt-get install -y wget unzip curl && \
     apt-get clean
 
-# تثبيت متصفح Chrome
-RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
-    apt-get install -y ./google-chrome-stable_current_amd64.deb && \
-    rm google-chrome-stable_current_amd64.deb
+# تحميل وفك ضغط متصفح Chrome
+RUN wget https://storage.googleapis.com/chrome-for-testing-public/122.0.6261.128/linux64/chrome-linux64.zip && \
+    unzip chrome-linux64.zip && \
+    mv chrome-linux64 /usr/bin/chrome && \
+    chmod +x /usr/bin/chrome && \
+    rm chrome-linux64.zip
 
 # نسخ ملف مدير التشغيل (ChromeDriver) إلى داخل الحاوية
 COPY chromedriver /usr/bin/chromedriver
