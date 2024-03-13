@@ -11,13 +11,12 @@ RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.d
     apt-get install -y ./google-chrome-stable_current_amd64.deb && \
     rm google-chrome-stable_current_amd64.deb
 
-# تنزيل وتثبيت مدير التشغيل
-RUN wget https://chromedriver.storage.googleapis.com/LATEST_RELEASE -O latest_release && \
-    wget https://chromedriver.storage.googleapis.com/$(cat latest_release)/chromedriver_linux64.zip && \
+# تنزيل وتثبيت مدير التشغيل بالإصدار المطلوب
+RUN wget https://chromedriver.storage.googleapis.com/122.0.6261.128/chromedriver_linux64.zip && \
     unzip chromedriver_linux64.zip && \
     mv chromedriver /usr/bin/chromedriver && \
     chmod +x /usr/bin/chromedriver && \
-    rm chromedriver_linux64.zip latest_release
+    rm chromedriver_linux64.zip
 
 # إنشاء وتحريك إلى دليل التطبيق
 WORKDIR /app
