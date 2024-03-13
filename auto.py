@@ -1,62 +1,66 @@
-from flask import Flask, request
+import os
+from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium import webdriver
-from webdriver_manager.chrome import ChromeDriverManager
-import os
-
-app = Flask(__name__)
 
 class YouLikeHits:
-    def __init__(self):
-        self.browser = None
+    def __init__(self, browser):
+        self.browser = browser
 
-    def init_browser(self):
-        chrome_options = webdriver.ChromeOptions()
-        chrome_options.add_argument("--headless")
-        chrome_options.add_argument("--no-sandbox")
-        chrome_options.add_argument("--disable-dev-shm-usage")
-        self.browser = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
+    def get_point(self):
+        point = self.browser.find_element(By.ID, 'currentpoints')
+        print('Your point is: ' + point.text)
+        return point
 
-    def login(self):
+    def go_to_website(self):
+        # انتقال إلى موقع YouLikeHits
         self.browser.get('https://www.youlikehits.com/login.php')
         WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.ID, 'username')))
-        username = self.browser.find_element(By.ID, 'username')
-        username.send_keys('am plays')
-        password = self.browser.find_element(By.ID, 'password')
-        password.send_keys('78945612')
-        login_button = self.browser.find_element(By.XPATH, '//input[@name="submit"]')
-        login_button.click()
 
-    def perform_task(self):
+        # ملء اسم المستخدم وكلمة المرور وتسجيل الدخول
+        uid = self.browser.find_element(By.ID, 'username')
+        uid.send_keys('am plays')
+        pwd = self.browser.find_element(By.ID, 'password')
+        pwd.send_keys('78945612')
+        btn = self.browser.find_element(By.XPATH, '/html/body/table[2]/tbody/tr/td/table/tbody/tr/td/table/tbody/tr[2]/td/center/form/table/tbody/tr[3]/td/span/input')
+        btn.click()
+
+        print('Getting credits... Please do not terminate the program.')
         while True:
             try:
-                self.browser.get('https://www.youlikehits.com/websites.php')
-                WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.LINK_TEXT, "Visit")))
-                surf = self.browser.find_element(By.LINK_TEXT, "Visit")
-                surf.click()
-                WebDriverWait(self.browser, 10).until(EC.number_of_windows_to_be(2))
-                self.browser.switch_to.window(self.browser.window_handles[1])
-                self.browser.close()
-                self.browser.switch_to.window(self.browser.window_handles[0])
-                break
+                self.browser.get('https://www.youlikehits.com/youtubenew2.php')
+                WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="listall"]/center/a[1]')))
+                yt_view = self.browser.find_element(By.XPATH, '//*[@id="listall"]/center/a[1]')
+                yt_view.click()
+
+                element_present = EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'Points Added')]"))
+                WebDriverWait(self.browser, 1000).until(element_present)
+
             except:
-                pass
+                while True:
+                    self.browser.get('https://www.youlikehits.com/websites.php')
+                    WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.LINK_TEXT, "Visit")))
+                    surf = self.browser.find_element(By.LINK_TEXT, "Visit")
+                    surf.click()
+                    WebDriverWait(self.browser, 10).until(EC.number_of_windows_to_be(2))
+                    self.browser.switch_to.window(self.browser.window_handles[1])
+                    self.browser.close()
+                    self.browser.switch_to.window(self.browser.window_handles[0])
 
     def close_browser(self):
         self.browser.quit()
 
-@app.route('/', methods=['GET', 'POST'])
-def home():
-    if request.method == 'GET':
-        ylh = YouLikeHits()
-        ylh.init_browser()
-        ylh.login()
-        ylh.perform_task()
+if __name__ == "__main__":
+    from selenium.webdriver.remote.webdriver import WebDriver
+    # Connect to Selenium Grid
+    grid_url = "http://selenium-hub:4444/wd/hub"
+    browser = webdriver.Remote(command_executor=grid_url, desired_capabilities=webdriver.DesiredCapabilities.CHROME)
+    
+    ylh = YouLikeHits(browser)
+    try:
+        ylh.go_to_website()
+    except:
+        print('Content not found to watch or surf. Refreshing webpage...')
+    finally:
         ylh.close_browser()
-        return "Task completed successfully!"
-
-if __name__ == '__main__':
-    port = int(os.getenv("PORT", default=5050))
-    app.run(host='0.0.0.0', port=port)
