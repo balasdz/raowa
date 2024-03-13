@@ -1,16 +1,20 @@
-ARG PORT=443
-FROM cypress/browsers:latest
+# استخدام تكوين البيئة الافتراضي لمنفذ Railway
+ARG PORT=8080
+FROM python:3.9
 
-RUN apt-get install python3 -y
+# تعيين المتغيرات
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
 
-RUN echo $(python3 -m site --user-base)
+# تثبيت الاعتماديات
+COPY requirements.txt /app/requirements.txt
+RUN pip install --no-cache-dir -r /app/requirements.txt
 
-COPY requirements.txt .
+# تعيين مسار العمل الافتراضي
+WORKDIR /app
 
-ENV PATH /host/root/.local/bin:${PATH}
+# نسخ الملفات إلى العمل الحالي
+COPY . /app
 
-RUN apt-get update && apt-get install -y python3-pip && pip install -r requirements.txt
-
-COPY . .
-
+# تشغيل التطبيق باستخدام Uvicorn عند تشغيل الحاوية
 CMD uvicorn main:app --host 0.0.0.0 --port $PORT
