@@ -1,66 +1,47 @@
-import os
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-class YouLikeHits:
-    def __init__(self, browser):
-        self.browser = browser
+# تهيئة متصفح Chrome
+driver = webdriver.Chrome()
 
-    def get_point(self):
-        point = self.browser.find_element(By.ID, 'currentpoints')
-        print('Your point is: ' + point.text)
-        return point
+try:
+    # افتح موقع YouLikeHits
+    driver.get("https://www.youlikehits.com/login.php")
 
-    def go_to_website(self):
-        # انتقال إلى موقع YouLikeHits
-        self.browser.get('https://www.youlikehits.com/login.php')
-        WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.ID, 'username')))
+    # انتظر حتى يتم تحميل حقل اسم المستخدم وأدخل اسم المستخدم وكلمة المرور
+    username_field = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "username")))
+    username_field.send_keys("اسم المستخدم هنا")
 
-        # ملء اسم المستخدم وكلمة المرور وتسجيل الدخول
-        uid = self.browser.find_element(By.ID, 'username')
-        uid.send_keys('am plays')
-        pwd = self.browser.find_element(By.ID, 'password')
-        pwd.send_keys('78945612')
-        btn = self.browser.find_element(By.XPATH, '/html/body/table[2]/tbody/tr/td/table/tbody/tr/td/table/tbody/tr[2]/td/center/form/table/tbody/tr[3]/td/span/input')
-        btn.click()
+    password_field = driver.find_element(By.ID, "password")
+    password_field.send_keys("كلمة المرور هنا")
 
-        print('Getting credits... Please do not terminate the program.')
-        while True:
-            try:
-                self.browser.get('https://www.youlikehits.com/youtubenew2.php')
-                WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="listall"]/center/a[1]')))
-                yt_view = self.browser.find_element(By.XPATH, '//*[@id="listall"]/center/a[1]')
-                yt_view.click()
+    # انتظر حتى يتم تحميل زر تسجيل الدخول وانقر عليه
+    login_button = driver.find_element(By.XPATH, "/html/body/table[2]/tbody/tr/td/table/tbody/tr/td/table/tbody/tr[2]/td/center/form/table/tbody/tr[3]/td/span/input")
+    login_button.click()
 
-                element_present = EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'Points Added')]"))
-                WebDriverWait(self.browser, 1000).until(element_present)
+    # انتظر حتى يتم تحميل صفحة النقاط الحالية
+    current_points = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "currentpoints")))
+    print("نقاطك الحالية: " + current_points.text)
 
-            except:
-                while True:
-                    self.browser.get('https://www.youlikehits.com/websites.php')
-                    WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.LINK_TEXT, "Visit")))
-                    surf = self.browser.find_element(By.LINK_TEXT, "Visit")
-                    surf.click()
-                    WebDriverWait(self.browser, 10).until(EC.number_of_windows_to_be(2))
-                    self.browser.switch_to.window(self.browser.window_handles[1])
-                    self.browser.close()
-                    self.browser.switch_to.window(self.browser.window_handles[0])
+    # قم بزيارة صفحة المواقع لجمع النقاط
+    driver.get("https://www.youlikehits.com/websites.php")
 
-    def close_browser(self):
-        self.browser.quit()
+    # انتظر حتى يتم تحميل الزر "Visit" وقم بالضغط عليه لزيارة الموقع
+    visit_button = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.LINK_TEXT, "Visit")))
+    visit_button.click()
 
-if __name__ == "__main__":
-    from selenium.webdriver.remote.webdriver import WebDriver
-    # Connect to Selenium Grid
-    grid_url = "http://selenium-hub:4444/wd/hub"
-    browser = webdriver.Remote(command_executor=grid_url, desired_capabilities=webdriver.DesiredCapabilities.CHROME)
-    
-    ylh = YouLikeHits(browser)
-    try:
-        ylh.go_to_website()
-    except:
-        print('Content not found to watch or surf. Refreshing webpage...')
-    finally:
-        ylh.close_browser()
+    # انتظر حتى يتم فتح نافذة جديدة
+    WebDriverWait(driver, 10).until(EC.number_of_windows_to_be(2))
+
+    # قم بتحويل التركيز إلى النافذة الجديدة وبعد ذلك أغلقها
+    driver.switch_to.window(driver.window_handles[1])
+    driver.close()
+
+    # استعد التركيز إلى النافذة الأصلية
+    driver.switch_to.window(driver.window_handles[0])
+
+finally:
+    # بعد الانتهاء، أغلق المتصفح
+    driver.quit()
