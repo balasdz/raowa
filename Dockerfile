@@ -12,7 +12,7 @@ RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.d
     rm google-chrome-stable_current_amd64.deb
 
 # تحميل وتثبيت مدير التشغيل
-RUN wget https://chromedriver.storage.googleapis.com/94.0.4606.41/chromedriver_linux64.zip && \
+RUN wget https://storage.googleapis.com/chrome-for-testing-public/122.0.6261.128/linux64/chromedriver-linux64.zip && \
     unzip chromedriver_linux64.zip && \
     mv chromedriver /usr/bin/chromedriver && \
     chmod +x /usr/bin/chromedriver
