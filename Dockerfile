@@ -6,17 +6,19 @@ RUN apt-get update && \
     apt-get install -y wget unzip curl && \
     apt-get clean
 
-# تنزيل وتثبيت متصفح Chrome من خلال ملف deb
-RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
-    apt-get install -y ./google-chrome-stable_current_amd64.deb && \
-    rm google-chrome-stable_current_amd64.deb
+# تنزيل وفك ضغط متصفح Chrome
+RUN wget https://storage.googleapis.com/chrome-for-testing-public/122.0.6261.128/linux64/chrome-linux64.zip && \
+    unzip chrome-linux64.zip && \
+    mv chrome-linux64 /usr/bin/chrome && \
+    chmod +x /usr/bin/chrome && \
+    rm chrome-linux64.zip
 
-# تنزيل وتثبيت مدير التشغيل بالإصدار المطلوب
-RUN wget https://chromedriver.storage.googleapis.com/122.0.6261.128/chromedriver_linux64.zip && \
-    unzip chromedriver_linux64.zip && \
+# تنزيل وفك ضغط مدير التشغيل بالإصدار المطلوب
+RUN wget https://storage.googleapis.com/chrome-for-testing-public/122.0.6261.128/linux64/chromedriver-linux64.zip && \
+    unzip chromedriver-linux64.zip && \
     mv chromedriver /usr/bin/chromedriver && \
     chmod +x /usr/bin/chromedriver && \
-    rm chromedriver_linux64.zip
+    rm chromedriver-linux64.zip
 
 # إنشاء وتحريك إلى دليل التطبيق
 WORKDIR /app
