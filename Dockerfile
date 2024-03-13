@@ -6,11 +6,10 @@ RUN apt-get update && \
     apt-get install -y wget unzip curl && \
     apt-get clean
 
-# تحميل وتثبيت متصفح Chrome ومفتاحه
-RUN curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - && \
-    echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list && \
-    apt-get -y update && \
-    apt-get -y install google-chrome-stable=94.0.4606.71-1
+# تنزيل وتثبيت متصفح Chrome من خلال ملف deb
+RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
+    apt-get install -y ./google-chrome-stable_current_amd64.deb && \
+    rm google-chrome-stable_current_amd64.deb
 
 # تحميل وتثبيت مدير التشغيل
 RUN wget https://chromedriver.storage.googleapis.com/94.0.4606.41/chromedriver_linux64.zip && \
