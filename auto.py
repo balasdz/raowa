@@ -2,7 +2,6 @@ from flask import Flask, request
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.keys import Keys
 from selenium import webdriver
 from selenium.webdriver.common.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
@@ -32,11 +31,23 @@ class YouLikeHits:
         login_button.click()
 
     def perform_task(self):
-        self.browser.get('https://www.youlikehits.com/youtubenew2.php')
-        WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="listall"]/center/a[1]')))
-        youtube_button = self.browser.find_element(By.XPATH, '//*[@id="listall"]/center/a[1]')
-        youtube_button.click()
-        WebDriverWait(self.browser, 1000).until(EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'Points Added')]")))
+        while True:
+            try:
+                self.browser.get('https://www.youlikehits.com/youtubenew2.php')
+                WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="listall"]/center/a[1]')))
+                youtube_button = self.browser.find_element(By.XPATH, '//*[@id="listall"]/center/a[1]')
+                youtube_button.click()
+                WebDriverWait(self.browser, 1000).until(EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'Points Added')]")))
+                break
+            except:
+                self.browser.get('https://www.youlikehits.com/websites.php')
+                WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.LINK_TEXT, "Visit")))
+                surf = self.browser.find_element(By.LINK_TEXT, "Visit")
+                surf.click()
+                WebDriverWait(self.browser, 10).until(EC.number_of_windows_to_be(2))
+                self.browser.switch_to.window(self.browser.window_handles[1])
+                self.browser.close()
+                self.browser.switch_to.window(self.browser.window_handles[0])
 
     def close_browser(self):
         self.browser.quit()
