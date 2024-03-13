@@ -1,17 +1,31 @@
-# Use the official Python image as a parent image
-FROM python:3
+# استخدام صورة بيثون
+FROM python:3.8-slim
 
-# Set the working directory in the container
+# تحديث وتثبيت الحزم الضرورية
+RUN apt-get update && \
+    apt-get install -y wget unzip curl && \
+    apt-get clean
+
+# تحميل وتثبيت متصفح Chrome ومفتاحه
+RUN curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - && \
+    echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list && \
+    apt-get -y update && \
+    apt-get -y install google-chrome-stable
+
+# تحميل وتثبيت مدير التشغيل
+RUN wget https://chromedriver.storage.googleapis.com/94.0.4606.41/chromedriver_linux64.zip && \
+    unzip chromedriver_linux64.zip && \
+    mv chromedriver /usr/bin/chromedriver && \
+    chmod +x /usr/bin/chromedriver
+
+# إنشاء وتحريك إلى دليل التطبيق
 WORKDIR /app
 
-# Copy the current directory contents into the container at /app
-COPY . /app
+# نسخ ملفات التطبيق إلى دليل العمل في الصورة
+COPY auto.py /app/
 
-# Install any needed packages specified in requirements.txt
+# تثبيت متطلبات التطبيق
 RUN pip install --no-cache-dir selenium
 
-# Make port 4444 available to the world outside this container
-EXPOSE 4444
-
-# Run the YouLikeHits script when the container launches
-CMD ["python", "./auto.py"]
+# تشغيل التطبيق عند بدء تشغيل الصورة
+CMD ["python", "auto.py"]
