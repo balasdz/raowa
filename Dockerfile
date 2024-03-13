@@ -1,16 +1,17 @@
-ARG PORT=443
-FROM cypress/browsers:latest
+# Use the official Python image as a parent image
+FROM python:3
 
-RUN apt-get install python3 -y
+# Set the working directory in the container
+WORKDIR /app
 
-RUN echo $(python3 -m site --user-base)
+# Copy the current directory contents into the container at /app
+COPY . /app
 
-COPY requirements.txt .
+# Install any needed packages specified in requirements.txt
+RUN pip install --no-cache-dir selenium
 
-ENV PATH /host/root/.local/bin:${PATH}
+# Make port 4444 available to the world outside this container
+EXPOSE 4444
 
-RUN apt-get update && apt-get install -y python3-pip && pip install -r requirements.txt
-
-COPY . .
-
-CMD uvicorn main:app --host 0.0.0.0 --port $PORT
+# Run the YouLikeHits script when the container launches
+CMD ["python", "./auto.py"]
