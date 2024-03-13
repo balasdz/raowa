@@ -32,13 +32,6 @@ class YouLikeHits:
     def perform_task(self):
         while True:
             try:
-                self.browser.get('https://www.youlikehits.com/youtubenew2.php')
-                WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="listall"]/center/a[1]')))
-                youtube_button = self.browser.find_element(By.XPATH, '//*[@id="listall"]/center/a[1]')
-                youtube_button.click()
-                WebDriverWait(self.browser, 1000).until(EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'Points Added')]")))
-                break
-            except:
                 self.browser.get('https://www.youlikehits.com/websites.php')
                 WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.LINK_TEXT, "Visit")))
                 surf = self.browser.find_element(By.LINK_TEXT, "Visit")
@@ -47,6 +40,9 @@ class YouLikeHits:
                 self.browser.switch_to.window(self.browser.window_handles[1])
                 self.browser.close()
                 self.browser.switch_to.window(self.browser.window_handles[0])
+                break
+            except:
+                pass
 
     def close_browser(self):
         self.browser.quit()
